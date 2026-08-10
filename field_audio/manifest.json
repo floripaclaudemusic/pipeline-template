@@ -1,0 +1,13 @@
+{
+  "assets": [
+    {
+      "id": "campo_001",
+      "path_or_url": "https://exemplo.com/meu-audio.wav",
+      "sha256": "0000000000000000000000000000000000000000000000000000000000000000",
+      "captured_at": "2026-11-01T07:30:00-03:00",
+      "location_hint": "Preencha com o local aproximado da captação",
+      "duration_s": 42,
+      "notes": "Descrição livre: o que é este som, por que está aqui."
+    }
+  ]
+}

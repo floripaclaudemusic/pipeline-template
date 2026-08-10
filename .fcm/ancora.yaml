@@ -1,0 +1,25 @@
+# Âncora cultural — declaração longa, complementa a de fcm.yaml.
+# Este arquivo é para você (e para o Curador Cultural) — a plataforma
+# usa apenas a versão curta em fcm.yaml.
+
+territorio: "Ribeirão da Ilha, Florianópolis, SC"
+
+historia_pessoal: |
+  Descreva sua relação com este território.
+  Se é herdada, dos avós, quantas gerações.
+  Se é adotada, quando chegou, o que reconheceu.
+
+repertorio_vivo: |
+  O que ainda se faz aqui hoje que é próprio deste lugar?
+  Nomes de pessoas, ruas, festas, ofícios.
+
+repertorio_em_risco: |
+  O que está desaparecendo em vida (rendeira que não passa adiante,
+  cantador que morreu sem gravar, prato que ninguém mais faz)?
+
+fontes_consultaveis: |
+  Livros, gravações, pessoas que você poderia entrevistar
+  se levasse este projeto adiante.
+
+licenca_uso: |
+  Autorizações que você tem para citar, referenciar, gravar.

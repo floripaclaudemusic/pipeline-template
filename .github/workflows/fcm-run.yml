@@ -1,0 +1,72 @@
+name: FCM Run
+
+# Executes the fcm.yaml pipeline in this repository using GitHub Actions.
+# Requires two secrets on the repo:
+#   ANTHROPIC_API_KEY  — participant's own Anthropic key (BYOK)
+#   FCM_PLATFORM_TOKEN — JWT issued by fcm-platform for registering the run
+
+on:
+  workflow_dispatch:
+    inputs:
+      pipeline_id:
+        description: 'fcm-platform pipeline UUID'
+        required: true
+      platform_url:
+        description: 'fcm-platform API base URL'
+        default: 'https://fcm.ifloripa.com.br/api'
+      max_iterations_override:
+        description: 'Optional max_iterations override'
+        required: false
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: write  # to commit the JSONL log back
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install fcm-runner CLI
+        run: |
+          pip install --upgrade pip
+          pip install httpx pyyaml jsonschema
+          # In production: pip install fcm-runner-cli
+          # For now, we fetch the runner script from the platform:
+          curl -fsSL "${{ inputs.platform_url }}/static/fcm_runner.py" -o fcm_runner.py
+
+      - name: Execute pipeline
+        env:
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          FCM_PLATFORM_URL:  ${{ inputs.platform_url }}
+        run: |
+          python fcm_runner.py execute \
+            --manifest fcm.yaml \
+            --output-dir runs/ \
+            ${{ inputs.max_iterations_override && format('--max-iterations {0}', inputs.max_iterations_override) || '' }}
+
+      - name: Commit run log
+        run: |
+          git config user.name  "fcm-runner[bot]"
+          git config user.email "runner@fcm.ifloripa.com.br"
+          git add runs/ outputs/ || true
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore(run): record execution at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+            git push
+          fi
+
+      - name: Register run with fcm-platform
+        env:
+          FCM_PLATFORM_TOKEN: ${{ secrets.FCM_PLATFORM_TOKEN }}
+        run: |
+          python fcm_runner.py register-run \
+            --pipeline-id "${{ inputs.pipeline_id }}" \
+            --run-manifest runs/latest.json \
+            --platform-url "${{ inputs.platform_url }}"
