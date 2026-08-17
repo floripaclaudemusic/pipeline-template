@@ -1,12 +1,11 @@
-spec_version: "1"
 
+spec_version: "1"
 pipeline:
   name: "meu-pipeline"
   description: "Descreva a hipótese que este pipeline testa."
   author: "SEU_GITHUB_USERNAME"
   license: "CC-BY-SA-4.0"
   max_iterations: 3
-
 ancora:
   territorio: "Ribeirão da Ilha, Florianópolis, SC"
   declaracao: |
@@ -15,17 +14,14 @@ ancora:
     Evite folclorização. Escreva como quem já morou ali.
   lexico_obrigatorio: []
   lexico_proibido: []
-
 agents:
   - id: letrista
     role: letrista
     kind: canonical
-    model: claude-opus-4-7
-    temperature: 0.8
+    model: claude-opus-4-8
     prompt_file: agents/letrista.md
     inputs:  [ancora]
     outputs: [letra]
-
   - id: prosodista
     role: prosodista
     kind: canonical
@@ -33,22 +29,27 @@ agents:
     prompt_file: agents/prosodista.md
     inputs:  [letra]
     outputs: [analise_prosodica]
-
   - id: critico
     role: critico_anticliche
     kind: canonical
-    model: claude-opus-4-7
+    model: claude-opus-4-8
     prompt_file: agents/critico.md
     inputs:  [letra, ancora]
     outputs: [marcas_cliche]
-
+  - id: arranjador_musical
+    role: arranjador_musical
+    kind: canonical
+    model: claude-sonnet-5
+    prompt_file: agents/arranjador_musical.md
+    inputs:  [letra, analise_prosodica, ancora]
+    outputs: [partitura]
 topology:
   entry: letrista
-  exit: [critico]
+  exit: [arranjador_musical]
   edges:
     - { from: letrista,   to: prosodista }
     - { from: prosodista, to: critico }
+    - { from: prosodista, to: arranjador_musical }
     - { from: critico,    to: letrista, kind: feedback, guard: "len(marcas_cliche) > 0" }
-
 field_audio_manifest: field_audio/manifest.json
-outputs_declared: [letra.md, analise_prosodica.md, plano_final.md]
+outputs_declared: [letra.md, analise_prosodica.md, plano_final.md, partitura.json]
