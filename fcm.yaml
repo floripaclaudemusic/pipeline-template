@@ -37,7 +37,7 @@ agents:
     inputs:  [letra, ancora]
     outputs: [marcas_cliche]
   - id: arranjador_musical
-    role: arranjador_musical
+    role: arranjador
     kind: canonical
     model: claude-sonnet-5
     prompt_file: agents/arranjador_musical.md
